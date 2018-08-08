@@ -166,7 +166,7 @@ function onScriptLoad()
 
 function onScriptUnload()
 {
-	for ( local i = 0; i < GetMaxPlayers(); ++i )
+	for ( local i = 0; i < GetMaxPlayers(); i++ )
 	if ( FindPlayer( i ) ) onPlayerPart( FindPlayer( i ), PARTREASON_TIMEOUT );
 }
 
