@@ -280,7 +280,7 @@ function onClientScriptData( player )
 		break;
 		case 2:
 			local q = QuerySQL( DB, "SELECT * FROM Accounts WHERE Name = '" + escapeSQLString( player.Name ) + "'" ), today = date(), dat = today.month + "/" + today.day + "/" + today.year;
-		    if ( !q ) QuerySQL( DB, "INSERT INTO Accounts ( Name, LowerName, Password, Level, UID, IP, Banned, Kills, Deaths, LastJoined ) VALUES ( '"+ escapeSQLString( player.Name ) +"', '"+ escapeSQLString( player.Name.tolower() ) +"', '"+ SHA256(string) +"', '1',  '"+ player.UID +"', '"+ player.IP +"', 'false', '0', '0', '"+ dat +"' )" );
+		    if ( !q ) QuerySQL( DB, "INSERT INTO Accounts ( Name, LowerName, Password, Level, UID, IP, Banned, Clan, ClanRank, Kills, Deaths, LastJoined ) VALUES ( '"+ escapeSQLString( player.Name ) +"', '"+ escapeSQLString( player.Name.tolower() ) +"', '"+ SHA256(string) +"', '1',  '"+ player.UID +"', '"+ player.IP +"', 'false', '0', '0', '"+ dat +"' )" );
 		    status[ player.ID ].Password = SHA256( string );
 		    status[ player.ID ].Level = 1;
 		    status[ player.ID ].UID = player.UID;
@@ -338,7 +338,7 @@ function AccInfo( player )
     //FreeSQLQuery( q );
 }
 
-function SaveStats(player)
+function SaveStats( player )
 {
 	local today = date(), dat = today.month + "/" + today.day + "/" + today.year;
 	QuerySQL( DB, format( @"UPDATE [Accounts] SET
@@ -348,8 +348,6 @@ function SaveStats(player)
         [UID] = '%s',
         [IP] = '%s',
 		[Banned] = '%s',
-		[Clan] = '%s',
-		[ClanRank] = '%s',
 		[Kills] = '%d',
 		[Deaths] = '%d'
         WHERE [Name] = '%s' AND [LowerName] = '%s';",
@@ -358,14 +356,13 @@ function SaveStats(player)
         status[ player.ID ].UID.tostring(),
         status[ player.ID ].IP.tostring(),
         status[ player.ID ].Banned.tostring(),
-        status[ player.ID ].Clan.tostring(),
-        status[ player.ID ].CRank.tostring(),
         status[ player.ID ].Kills.tointeger(),
         status[ player.ID ].Deaths.tointeger(),
         player.Name,
         player.Name.tolower()
     )
 	);
+	if( status[ player.ID ].Clan != null ) QuerySQL( DB, "UPDATE Accounts SET Clan = '"+ status[ player.ID ].Clan +"', ClanRank = '"+ status[ player.ID ].CRank +"' WHERE Name = '"+ escapeSQLString( player.Name ) +"' AND LowerName = '"+ escapeSQLString( player.Name.tolower() ) +"'" );
 }
 	
 function onPlayerPart( player, reason )
