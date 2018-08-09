@@ -1,4 +1,3 @@
-
 class PlayerStats
 {
 	LastJoined = null;
@@ -13,6 +12,7 @@ class PlayerStats
 	CRank = null;
 	Kills = 0;
 	Deaths = 0;
+	XP = 0;
 }
 
 pCamera <- array( GetMaxPlayers() );
@@ -160,7 +160,7 @@ function onScriptLoad()
 	DB <- ConnectSQL( "databases/MainDatabase.db" );
 	status <- array( GetMaxPlayers(), null );
 	intro <- array( GetMaxPlayers(), false );
-	QuerySQL( DB, "CREATE TABLE if not exists Accounts ( Name TEXT, LowerName TEXT, Password VARCHAR ( 255 ), Level NUMERIC DEFAULT 1, TimeRegistered VARCHAR ( 255 ) DEFAULT CURRENT_TIMESTAMP, UID VARCHAR ( 255 ), IP VARCHAR ( 255 ), Banned TEXT, Clan VARCHAR ( 255 ), ClanRank VARCHAR ( 255 ), Kills VARCHAR ( 255 ), Deaths VARCHAR ( 255 ), LastJoined VARCHAR ( 255 ) ) ");
+	QuerySQL( DB, "CREATE TABLE if not exists Accounts ( Name TEXT, LowerName TEXT, Password VARCHAR ( 255 ), Level NUMERIC DEFAULT 1, TimeRegistered VARCHAR ( 255 ) DEFAULT CURRENT_TIMESTAMP, UID VARCHAR ( 255 ), IP VARCHAR ( 255 ), Banned TEXT, Clan VARCHAR ( 255 ), ClanRank VARCHAR ( 255 ), Kills VARCHAR ( 255 ), Deaths VARCHAR ( 255 ), LastJoined VARCHAR ( 255 ), XP VARCHAR ( 255 ) ) ");
 	SetWastedSettings( 2000, 1000, 2, 2, RGB( 0, 0, 0 ), 1000, 1000 );
 }
 
@@ -333,9 +333,66 @@ function AccInfo( player )
 		status[ player.ID ].Kills = GetSQLColumnData( q, 10 );
 		status[ player.ID ].Deaths = GetSQLColumnData( q, 11 );
 		status[ player.ID ].LastJoined = GetSQLColumnData( q, 12 );
+		status[ player.ID ].XP = GetSQLColumnData( q, 13 );
 		status[ player.ID ].Registered = true;
 	}
     //FreeSQLQuery( q );
+}
+
+
+function GetRank(player)
+{
+	if ( status[ player.ID ].XP >= 0 && status[player.ID].XP <= 2999) return "Recruit";
+	if ( status[ player.ID ].XP >= 3000 && status[player.ID].XP <= 7999) return "Private First Class";
+	if ( status[ player.ID ].XP >= 8000 && status[player.ID].XP <= 10999) return "Private First Class II";
+	if ( status[ player.ID ].XP >= 11000 && status[player.ID].XP <= 12999) return "Private First Class III";
+	if ( status[ player.ID ].XP >= 13000 && status[player.ID].XP <= 16999) return "Private First Class IV";
+	if ( status[ player.ID ].XP >= 17000 && status[player.ID].XP <= 17999) return "Private First Class V";
+	if ( status[ player.ID ].XP >= 18000 && status[player.ID].XP <= 20999) return "Lance Corporal";
+	if ( status[ player.ID ].XP >= 21000 && status[player.ID].XP <= 23999) return "Lance Corporal II";
+	if ( status[ player.ID ].XP >= 24000 && status[player.ID].XP <= 27999) return "Lance Corporal III";
+	if ( status[ player.ID ].XP >= 25000 && status[player.ID].XP <= 27999) return "Lance Corporal IV";
+	if ( status[ player.ID ].XP >= 28000 && status[player.ID].XP <= 28999) return "Lance Corporal V";
+	if ( status[ player.ID ].XP >= 29000 && status[player.ID].XP <= 31999) return "Corporal";
+	if ( status[ player.ID ].XP >= 32000 && status[player.ID].XP <= 32999) return "Corporal II";
+	if ( status[ player.ID ].XP >= 33000 && status[player.ID].XP <= 34999) return "Corporal III";
+	if ( status[ player.ID ].XP >= 35000 && status[player.ID].XP <= 36999) return "Corporal IV";
+	if ( status[ player.ID ].XP >= 37000 && status[player.ID].XP <= 38999) return "Corporal V";
+	if ( status[ player.ID ].XP>= 39000 && status[player.ID].XP <= 39999) return "Sergeant";
+	if ( status[ player.ID ].XP >= 40000 && status[player.ID].XP <= 41999) return "Sergeant II";
+	if ( status[ player.ID ].XP>= 42000 && status[player.ID].XP <= 43999) return "Sergeant III";
+	if ( status[ player.ID ].XP >= 44000 && status[player.ID].XP <= 45999) return "Sergeant IV";
+	if ( status[ player.ID ].XP >= 46000 && status[player.ID].XP <= 46999) return "Sergeant V";
+	if ( status[ player.ID ].XP >= 47000 && status[player.ID].XP <= 47999) return "Staff Sergeant";
+	if ( status[ player.ID ].XP >= 48000 && status[player.ID].XP <= 50999) return "Staff Sergeant III";
+	if ( status[ player.ID ].XP >= 51000 && status[player.ID].XP <= 51999) return "Staff Sergeant IV";
+	if ( status[ player.ID ].XP >= 52000 && status[player.ID].XP <= 53999) return "Staff Sergeant V";
+	if ( status[ player.ID ].XP >= 54000 && status[player.ID].XP <= 54999) return "Gunnery Sergeant";
+	if ( status[ player.ID ].XP >= 55000 && status[player.ID].XP <= 55999) return "Gunnery Sergeant II";
+	if ( status[ player.ID ].XP >= 56000 && status[player.ID].XP <= 57999) return "Gunnery Sergeant III";
+	if ( status[ player.ID ].XP >= 58000 && status[player.ID].XP <= 58999) return "Gunnery Sergeant IV";
+	if ( status[ player.ID ].XP >= 59000 && status[player.ID].XP <= 59999) return "Gunnery Sergeant V";
+	if ( status[ player.ID ].XP >= 60000 && status[player.ID].XP <= 68999) return "Master Sergeant";
+	if ( status[ player.ID ].XP >= 69000 && status[player.ID].XP <= 69999) return "Master Sergeant II";
+	if ( status[ player.ID ].XP >= 70000 && status[player.ID].XP <= 70999) return "Master Sergeant III";
+	if ( status[ player.ID ].XP >= 71000 && status[player.ID].XP <= 71999) return "Master Sergeant IV";
+	if ( status[ player.ID ].XP >= 72000 && status[player.ID].XP <= 73999) return "Master Sergeant V";
+	if ( status[ player.ID ].XP >= 74000 && status[player.ID].XP <= 77999) return "First Sergeant";
+	if ( status[ player.ID ].XP >= 78000 && status[player.ID].XP <= 79999) return "First Sergeant II";
+	if ( status[ player.ID ].XP >= 80000 && status[player.ID].XP <= 80999) return "First Sergeant III";
+	if ( status[ player.ID ].XP >= 81000 && status[player.ID].XP <= 81999) return "First Sergeant IV";
+	if ( status[ player.ID ].XP >= 82000 && status[player.ID].XP <= 82999) return "First Sergeant V";
+	if ( status[ player.ID ].XP >= 83000 && status[player.ID].XP <= 83999) return "Master Gunnery Sergeant";
+	if ( status[ player.ID ].XP >= 84000 && status[player.ID].XP <= 84999) return "Master Gunnery Sergeant II";
+	if ( status[ player.ID ].XP >= 85000 && status[player.ID].XP <= 89999) return "Master Gunnery Sergeant III";
+	if ( status[ player.ID ].XP >= 90000 && status[player.ID].XP <= 91999) return "Master Gunnery Sergeant IV";
+	if ( status[ player.ID ].XP >= 92000 && status[player.ID].XP <= 93999) return "Master Gunnery Sergeant V";
+	if ( status[ player.ID ].XP >= 94000 && status[player.ID].XP <= 95999) return "Sergeant Major";
+	if ( status[ player.ID ].XP >= 96000 && status[player.ID].XP <= 97999) return "Sergeant Major II";
+	if ( status[ player.ID ].XP >= 98000 && status[player.ID].XP <= 99999) return "Sergeant Major III";
+	if ( status[ player.ID ].XP >= 100000 && status[player.ID].XP <= 103999) return "Sergeant Major IV";
+	if ( status[ player.ID ].XP >= 104000 && status[player.ID].XP <= 10000000000) return "Sergeant Major V";
+
 }
 
 function SaveStats( player )
@@ -358,6 +415,7 @@ function SaveStats( player )
         status[ player.ID ].Banned.tostring(),
         status[ player.ID ].Kills.tointeger(),
         status[ player.ID ].Deaths.tointeger(),
+	status[ player.ID ].XP.tointeger(),
         player.Name,
         player.Name.tolower()
     )
@@ -495,7 +553,6 @@ function NumTok(string, separator)
 
 function onPlayerCommand( player, cmd, text )
 {
-	local cmd, text;
 	cmd = cmd.tolower();
 	if( cmd == "s" )
 	{
@@ -503,6 +560,12 @@ function onPlayerCommand( player, cmd, text )
 	    if( player.Vehicle ) Message += "| Vehicle Angle: "+ player.Vehicle.Angle +" | Euler Angle: "+ player.Vehicle.EulerAngle +" | Rotation: "+ player.Vehicle.Rotation +".";
 		ServerMsg( Message , player );
 	}
+
+	else if ( cmd == "rank" )
+	{
+		ServerMsg( "Your rank: " +GetRank(player)+ " XP: " + status[player.ID].XP , player )
+	}
+
 	else if ( cmd == "cam" )
 	{
 		if ( !pCamera[ player.ID ].IsEnabled() )
