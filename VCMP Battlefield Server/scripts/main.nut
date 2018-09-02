@@ -350,7 +350,7 @@ function onPlayerFall( player, speed )
 {
 	if( speed > 5 ) 
 	{
-		Announce( "Open your parachute!", player, 1 );
+		Announce( "Open your parachute using SPACEBAR!", player, 1 );
 		isOnParachuteHeight[ player.ID ] = true;
 	}
 } 
