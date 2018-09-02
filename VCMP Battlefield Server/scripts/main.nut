@@ -363,6 +363,8 @@ function _PlayerFallResetFunc()
 		local player = FindPlayer( i );
 		if( player )
 		{
+			isOnParachuteHeight[ player.ID ] = false;
+			Announce( "", player, 1 );
 			if( (player.Vehicle) && (plrParachute[player.ID]) && (player.Vehicle.ID == plrParachute[player.ID].ID) ) 
 			{
 				if( forParachute[player.ID] == 1 )
@@ -371,7 +373,7 @@ function _PlayerFallResetFunc()
 				 player.Vehicle.AddSpeed( Vector( vSpd.x *1.5, vSpd.y *1.5, vSpd.z +0.2 ) );
 				 forParachute[player.ID] = 0;
 				}
-				else if( ( player.Vehicle.Speed.z < 0.01 ) && ( player.Vehicle.Speed.z > -0.01 ) ) 
+				else if( ( player.Vehicle.Speed.z < 0.02 ) && ( player.Vehicle.Speed.z > -0.01 ) ) 
 				onPlayerExitVehicle( player, player.Vehicle );
 			}
 		}
