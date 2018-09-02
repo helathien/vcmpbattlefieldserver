@@ -512,10 +512,8 @@ function AddDeathLogLine( str )
 {
 	DeathLog.Messages.push( str );
 	local maxLines = DeathLog.MaxLines, _array = DeathLog.Messages, chatbox = DeathLog.Msgs;
-	Console.Print( "Current array's length: "+ _array.len() );
 	for( local i = 0; i < _array.len(); i++ )
 	{
-		Console.Print( "Iteration "+ i );
 		if( i <= DeathLog.CurrentLines )
 		{
 			if( chatbox[i] == "empty" )
