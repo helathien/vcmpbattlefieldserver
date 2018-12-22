@@ -1,0 +1,262 @@
+
+
+
+//========================CLASSES ADDED 4==================================//
+class PlayerStats
+{
+	LastJoined = null;
+	Password = null;
+	Level = 0;
+	UID = null;
+	IP = null;
+	LoggedIn = false;
+	Registered = false;
+	Banned = false;
+	Clan = null;
+	CRank = null;
+	Kills = 0;
+	Deaths = 0;
+	Primarykey = 5;
+	Secondrykey = 6;
+	Lethalkey = 7;
+	Gadgetkey = 8;
+	
+}
+
+//======================KEYBINDED & DATABASE----------------------------------------//
+//====NOTE: DELTE maindatase.db and restart.=//
+
+function onScriptLoad()
+{
+	//==================== Key binds =================================
+	KEY_UP <- BindKey( true, 0x26, 0, 0);
+	KEY_LEFT <- BindKey( true, 0x25, 0, 0 );
+	KEY_RIGHT <- BindKey( true, 0x27, 0, 0 );
+	KEY_DOWN <- BindKey( true, 0x28, 0, 0 );
+	KEY_1 <- BindKey( true, 0x31, 0, 0 );
+	KEY_2 <- BindKey( true, 0x32, 0, 0 );
+	KEY_3 <- BindKey( true, 0x33, 0, 0 );
+	KEY_4 <- BindKey( true, 0x34, 0, 0 );
+	KEY_5 <- BindKey( true, 0x35, 0, 0 );
+	KEY_6 <- BindKey( true, 0x36, 0, 0 );
+	KEY_7 <- BindKey( true, 0x37, 0, 0 );
+	KEY_8 <- BindKey( true, 0x38, 0, 0 );
+	KEY_9 <- BindKey( true, 0x39, 0, 0 );
+	//====================ABCD====================//
+	KEY_A <- BindKey( true, 0x41, 0, 0 );
+	KEY_B <- BindKey( true, 0x42, 0, 0 );
+	KEY_C <- BindKey( true, 0x43, 0, 0 );
+	KEY_D <- BindKey( true, 0x44, 0, 0 );
+	KEY_E <- BindKey( true, 0x45, 0, 0 );
+	KEY_F <- BindKey( true, 0x46, 0, 0 );
+	KEY_G <- BindKey( true, 0x47, 0, 0 );
+	KEY_H <- BindKey( true, 0x48, 0, 0 );
+	KEY_I <- BindKey( true, 0x49, 0, 0 );
+	KEY_J <- BindKey( true, 0x4A, 0, 0 );
+	KEY_K <- BindKey( true, 0x4B, 0, 0 );
+	KEY_L <- BindKey( true, 0x4C, 0, 0 );
+	KEY_M <- BindKey( true, 0x4D, 0, 0 );
+	KEY_N <- BindKey( true, 0x4E, 0, 0 );
+	KEY_O <- BindKey( true, 0x4F, 0, 0 );
+	KEY_P <- BindKey( true, 0x50, 0, 0 );
+	KEY_Q <- BindKey( true, 0x51, 0, 0 );
+	KEY_R <- BindKey( true, 0x52, 0, 0 );
+	KEY_S <- BindKey( true, 0x53, 0, 0 );
+	KEY_T <- BindKey( true, 0x54, 0, 0 );
+	KEY_U <- BindKey( true, 0x55, 0, 0 );
+	KEY_V <- BindKey( true, 0x56, 0, 0 );
+	KEY_W <- BindKey( true, 0x57, 0, 0 )
+	KEY_X <- BindKey( true, 0x58, 0, 0 );
+	KEY_Y <- BindKey( true, 0x59, 0, 0 );
+	KEY_Z <- BindKey( true, 0x5A, 0, 0 );
+	print("Keys binded")
+
+	//==================== Queries ===================================
+	DB <- ConnectSQL( "databases/MainDatabase.db" );
+	QuerySQL( DB, "CREATE TABLE if not exists Accounts ( Name TEXT, LowerName TEXT, Password VARCHAR ( 255 ), Level NUMERIC DEFAULT 1, TimeRegistered VARCHAR ( 255 ) DEFAULT CURRENT_TIMESTAMP, UID VARCHAR ( 255 ), IP VARCHAR ( 255 ), Banned TEXT, Clan VARCHAR ( 255 ), ClanRank VARCHAR ( 255 ), Kills VARCHAR ( 255 ), Deaths VARCHAR ( 255 ), LastJoined VARCHAR ( 255 ), KEY1, KEY2, KEY3, KEY4)");
+	//==================== Arrays/Tables =============================
+	status <- array( GetMaxPlayers(), null );
+	onlinePlrs <- [];
+	intro <- array( GetMaxPlayers(), false );
+	max_ammo <- array( GetMaxPlayers(), 0 );
+	next_mag <- array( GetMaxPlayers(), 0 );
+	regenTimer <- array( GetMaxPlayers(), null );
+	regenTimer2 <- array( GetMaxPlayers(), null );
+	isRegen <- array( GetMaxPlayers(), false );
+	nogoto <- array( GetMaxPlayers(), false );
+	//==================== Misc. =====================================
+	pUpdateTimer <- NewTimer( "Update", 1000/30, 0 );
+	SetPassword( "" );
+	SetWastedSettings( 2000, 1000, 2, 2, RGB( 0, 0, 0 ), 1000, 1000 );
+	//=================== Classes ====================================
+	AddClass( 1, RGB( 0, 206, 247 ), 200, Vector( -378.79, -537.962, 17.2832 ), 140.020, 21, 60, 23, 90, 26, 60 );
+}
+
+
+
+
+
+//====================TO GET KEYS FROM DATABASE============================//
+function AccInfo( player )
+{
+	local q = QuerySQL( DB, "SELECT * FROM Accounts WHERE Name = '" + escapeSQLString( player.Name ) + "'" );
+	if( q ) 
+	{
+		status[ player.ID ].Password = GetSQLColumnData( q, 2 );
+		status[ player.ID ].Level = GetSQLColumnData( q, 3 );
+		status[ player.ID ].UID = GetSQLColumnData( q, 5 );
+		status[ player.ID ].IP = GetSQLColumnData( q, 6 );
+		status[ player.ID ].Banned = GetSQLColumnData( q, 7 );
+		status[ player.ID ].Primarykey = GetSQLColumnData( q, 13 ).tointeger();
+		status[ player.ID ].Secondrykey = GetSQLColumnData( q, 14 ).tointeger();
+		status[ player.ID ].Lethalkey = GetSQLColumnData( q, 15 ).tointeger();
+		status[ player.ID ].Gadgetkey = GetSQLColumnData( q, 16 ).tointeger();
+		if( GetSQLColumnData( q, 8 ) != null )
+		{
+			status[ player.ID ].Clan = GetSQLColumnData( q, 8 );
+			status[ player.ID ].CRank = GetSQLColumnData( q, 9 );
+		}
+		status[ player.ID ].Kills = GetSQLColumnData( q, 10 );
+		status[ player.ID ].Deaths = GetSQLColumnData( q, 11 );
+		status[ player.ID ].LastJoined = GetSQLColumnData( q, 12 );
+		status[ player.ID ].Registered = true;
+		MessagePlayer( "[#33cc33]Information: [#ffffff]Recieved info: " +GetSQLColumnData( q, 13 )+ " " +GetSQLColumnData( q, 14 )+ " "+GetSQLColumnData( q, 15 )+ " "+GetSQLColumnData( q, 16 ) ,player )
+	}
+    //FreeSQLQuery( q );
+}
+
+
+//===============================COMMAND==============================================//
+
+else if ( cmd == "setkey" || cmd == "setkeys" )
+		{
+		if (!text) ServerMsg( "Error: /"+cmd+" <primary, secondry, lethal, gadget> <key>." ,player )
+		else if ( !GetTok( text," ",2) ) ServerMsg( "Error: /"+cmd+" <primary, secondry, lethal, gadget> <key>.", player )
+		else
+		{
+			if ( GetTok( text," ",1).tolower() == "primary" || GetTok( text," ",1).tolower() == "secondry" || GetTok( text," ",1).tolower() == "lethal" || GetTok( text," ",1).tolower() == "gadget" )
+			{	
+				if ( GetTok( text," ", 2).len() < 2 )
+					{
+					local key = GetTok( text, " ", 2).tolower();
+					local keytype = GetTok( text, " ", 1 ).tolower();
+					if ( keytype == "primary" ) SetKey( 1, key, player );
+					if ( keytype == "secondry" ) SetKey( 2, key, player );
+					if ( keytype == "lethal" ) SetKey( 3, key, player );
+					if ( keytype == "gadget" ) SetKey( 4, key, player );
+				}
+				
+				else ServerMsg( "Error: Key can not be more then one." , player )
+			}
+			else ServerMsg( "Error: /"+cmd+" <primary/secondry/lethal/gadget> <key>." ,player)
+			
+		}
+	}
+
+
+
+
+//==========================FUNCTIONS==================================//
+function SetKey( keytype, key, player ) //setting the keys and replacing the previous key
+{
+	local p = status[player.ID].Primarykey.tointeger();
+	local s = status[player.ID].Secondrykey.tointeger();
+	local l = status[player.ID].Lethalkey.tointeger();
+	local g = status[player.ID].Gadgetkey.tointeger();
+	if ( keytype == 1 )
+	{
+		if ( s == gg(key).tointeger() ) status[player.ID].Secondrykey = p.tointeger();
+		else if ( l == gg(key).tointeger()) status[player.ID].Lethalkey = p.tointeger() ;
+		else if ( g == gg(key).tointeger() ) status[player.ID].Gadgetkey = p.tointeger();
+		status[player.ID].Primarykey = gg(key).tointeger();
+		local pkey = status[player.ID].Primarykey.tointeger()
+		SaveKeys( pkey, player, 1 )
+		ServerMsg( "Primary key changed to "+key , player )
+	}
+
+	if ( keytype == 2 )
+	{	
+		if ( p == gg(key).tointeger() ) status[player.ID].Primarykey = s.tointeger();
+		if ( l == gg(key).tointeger() ) status[player.ID].Lethalkey = s.tointeger();
+		if ( g == gg(key).tointeger() ) status[player.ID].Gadgetkey = s.tointeger();
+		status[player.ID].Secondrykey = gg(key).tointeger();
+		skey = status[player.ID].Secondrykey.tointeger()
+		SaveKeys( pkey, player, 2 )
+		ServerMsg( "Secondry key changed to "+key , player )
+	}
+
+	if ( keytype == 3 )
+	{
+		if ( p == gg(key).tointeger() ) status[player.ID].Primarykey = l.tointeger();
+		if ( s == gg(key).tointeger() ) status[player.ID].Secondrykey = l.tointeger();
+		if ( g == gg(key).tointeger() ) status[player.ID].Gadgetkey = l.tointeger();
+		status[player.ID].Lethalkey = gg(key).tointeger();	
+		lkey = status[player.ID].Lethalkey.tointeger()
+		SaveKeys( pkey, player, 3 )
+		ServerMsg( "Lethal key changed to "+key , player )
+	}
+
+	if ( keytype == 4 )
+	{
+		if ( p == gg(key).tointeger() ) status[player.ID].Primarykey = g.tointeger();
+		if ( s == gg(key).tointeger() ) status[player.ID].Secondrykey = g.tointeger();
+		if ( l == gg(key).tointeger() ) status[player.ID].Lethalkey = g.tointeger();
+		status[player.ID].Gadgetkey = gg(key).tointeger();
+		gkey = status[player.ID].Gadgetkey.tointeger()
+		SaveKeys( pkey, player, 4 )
+		ServerMsg( "Gadget key changed to "+key , player )
+	}
+}
+
+
+
+function SaveKeys( key, player, type ) //saving the keys
+{
+	local key = key;
+	if ( type == 1 ) QuerySQL( DB, "UPDATE Accounts SET KEY1 = '"+key+"' WHERE NAME = '"+escapeSQLString(player.Name)+"'");
+	if ( type == 2 ) QuerySQL(  DB, "UPDATE Accounts SET KEY2 = '"+key+"' WHERE NAME = '"+escapeSQLString(player.Name)+"'");
+	if ( type == 3 ) QuerySQL(  DB, "UPDATE Accounts SET KEY3 = '"+key+"' WHERE NAME = '"+escapeSQLString(player.Name)+"'");
+	if ( type == 4 ) QuerySQL( DB,  "UPDATE ACcounts SEt KEY4 = '"+key+"' WHERE NAME = '"+escapeSQLString(player.Name)+"'");
+}
+
+
+
+function gg(key) //Just to make it kinda easier i guess
+{
+	if ( key == "1" ) return KEY_1;
+	if ( key == "2" ) return KEY_2;
+	if ( key == "3" ) return KEY_3;
+	if ( key == "4" ) return KEY_4;
+	if ( key == "5" ) return KEY_5;
+	if ( key == "6" ) return KEY_6;
+	if ( key == "7" ) return KEY_7;
+	if ( key == "8" ) return KEY_8;
+	if ( key == "9" ) return KEY_9;
+	if ( key == "10" ) return KEY_10;
+	if ( key == "a" ) return KEY_A;
+	if ( key == "b" ) return KEY_B;
+	if ( key == "c" ) return KEY_C;
+	if ( key == "d" ) return KEY_D;
+	if ( key == "e" ) return KEY_E;
+	if ( key == "f" ) return KEY_F;
+	if ( key == "g" ) return KEY_G;
+	if ( key == "h" ) return KEY_H;
+	if ( key == "i" ) return KEY_I;
+	if ( key == "j" ) return KEY_J;
+	if ( key == "k" ) return KEY_K;
+	if ( key == "l" ) return KEY_L;
+	if ( key == "m" ) return KEY_M;
+	if ( key == "n" ) return KEY_N;
+	if ( key == "o" ) return KEY_O;
+	if ( key == "p" ) return KEY_P;
+	if ( key == "q" ) return KEY_Q;
+	if ( key == "r" ) return KEY_R;
+	if ( key == "s" ) return KEY_S;
+	if ( key == "t" ) return KEY_T;
+	if ( key == "u" ) return KEY_U;
+	if ( key == "v" ) return KEY_V;
+	if ( key == "w" ) return KEY_W;
+	if ( key == "x" ) return KEY_X;
+	if ( key == "y" ) return KEY_Y;
+	if ( key == "z" ) return KEY_Z;
+}
